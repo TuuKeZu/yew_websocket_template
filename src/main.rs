@@ -124,23 +124,59 @@ impl Component for State {
             </div>
         };
 
-        let chat_screen = html! {
-            <div class="chat-screen">
-                <div class="message-list">
-                    {
-                        for self.chat.iter().map(|content| {
-
-                            html! {
-                                <div class="message">
-                                    <h1>{content}</h1>
-                                </div>
-                            }
-                        })
-                    }
+        let game_screen = html! {
+            <div class="game-screen">
+                /* For frontend testing only - TODO generate runtime */
+                <div class="row">
+                    <div class="column">
+                        <div class="square occupied">
+                            <h1>{"O"}</h1>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="square occupied">
+                            <h1>{"X"}</h1>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="square occupied">
+                            <h1>{"X"}</h1>
+                        </div>
+                    </div>
                 </div>
-                <div class="input-area">
-                    <input value={self.input.clone()} type="text" placeholder="Send a message" oninput=self.link.callback(|e: InputData| Msg::OnInput(e.value))/>
-                    <button onclick=self.link.callback(|_| Msg::SendMessage())>{ "Send" }</button>
+                <div class="row">
+                    <div class="column">
+                        <div class="square empty">
+                            <h1>{""}</h1>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="square empty">
+                            <h1>{""}</h1>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="square occupied">
+                            <h1>{"X"}</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column">
+                        <div class="square occupied">
+                            <h1>{"O"}</h1>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="square occupied">
+                            <h1>{"X"}</h1>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="square occupied">
+                            <h1>{"O"}</h1>
+                        </div>
+                    </div>
                 </div>
             </div>
         };
@@ -148,8 +184,8 @@ impl Component for State {
         html! {
             <div class="container">
                 {
-                    if self.connected {
-                        chat_screen
+                    if !self.connected {
+                        game_screen
                     }
                     else {
                         loading_screen
