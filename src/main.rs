@@ -8,7 +8,7 @@ use yew::prelude::*;
 use yew::services::websocket::{WebSocketService, WebSocketStatus, WebSocketTask};
 use yew::services::ConsoleService;
 
-struct Model {
+struct State {
     ws: Option<WebSocketTask>,
     link: ComponentLink<Self>,
 
@@ -26,7 +26,7 @@ enum Msg {
     Error(String),
 }
 
-impl Component for Model {
+impl Component for State {
     type Message = Msg;
     type Properties = ();
 
@@ -118,29 +118,43 @@ impl Component for Model {
     }
 
     fn view(&self) -> Html {
+        let loading_screen = html! {
+            <div class="connect-screen">
+                <button onclick=self.link.callback(|_| Msg::Connect)>{ "Connect" }</button>
+            </div>
+        };
+
+        let chat_screen = html! {
+            <div class="chat-screen">
+                <div class="message-list">
+                    {
+                        for self.chat.iter().map(|content| {
+
+                            html! {
+                                <div class="message">
+                                    <h1>{content}</h1>
+                                </div>
+                            }
+                        })
+                    }
+                </div>
+                <div class="input-area">
+                    <input value={self.input.clone()} type="text" placeholder="Send a message" oninput=self.link.callback(|e: InputData| Msg::OnInput(e.value))/>
+                    <button onclick=self.link.callback(|_| Msg::SendMessage())>{ "Send" }</button>
+                </div>
+            </div>
+        };
+
         html! {
             <div class="container">
-                <div class="connect-screen" style={format!("display: {}", if !self.connected {"flex"} else {"none"})}>
-                    <button onclick=self.link.callback(|_| Msg::Connect)>{ "Connect" }</button>
-                </div>
-                <div class="chat-screen" /*  style={format!("display: {}", if self.connected {"flex"} else {"none"})}*/>
-                    <div class="message-list">
-                        {
-                            for self.chat.iter().map(|content| {
-
-                                html! {
-                                    <div class="message">
-                                        <h1>{content}</h1>
-                                    </div>
-                                }
-                            })
-                        }
-                    </div>
-                    <div class="input-area">
-                        <input value={self.input.clone()} type="text" placeholder="Send a message" oninput=self.link.callback(|e: InputData| Msg::OnInput(e.value))/><br/>
-                        <button onclick=self.link.callback(|_| Msg::SendMessage())>{ "Send" }</button>
-                    </div>
-                </div>
+                {
+                    if self.connected {
+                        chat_screen
+                    }
+                    else {
+                        loading_screen
+                    }
+                }
             </div>
         }
     }
@@ -151,5 +165,5 @@ pub fn to_json(data: PacketType) -> String {
 }
 
 fn main() {
-    yew::start_app::<Model>();
+    yew::start_app::<State>();
 }
